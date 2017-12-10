@@ -93,7 +93,7 @@
     },
     created() {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
-      this.goods = initData.data;
+      this.goods = initData.goods;
       this.$nextTick(() => {
         this._initScroll();
         this._calculateHeight();
