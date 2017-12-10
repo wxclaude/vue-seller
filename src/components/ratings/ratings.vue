@@ -46,6 +46,8 @@
               </div>
               <div class="time">
                 {{rating.rateTime | formatDate}}
+
+
               </div>
             </div>
           </li>
@@ -61,10 +63,9 @@
   import star from 'components/star/star';
   import ratingselect from 'components/ratingselect/ratingselect';
   import split from 'components/split/split';
+  import {initData} from 'common/js/initData';
 
   const ALL = 2;
-  const ERR_OK = 0;
-  const debug = process.env.NODE_ENV !== 'production';
 
   export default {
     props: {
@@ -80,17 +81,11 @@
       };
     },
     created() {
-      const url = debug ? '/api/ratings' : 'http://wxclaude.com/sell/api/ratings';
-      this.$http.get(url).then((response) => {
-        response = response.body;
-        if (response.errno === ERR_OK) {
-          this.ratings = response.data;
-          this.$nextTick(() => {
-            this.scroll = new BScroll(this.$refs.ratings, {
-              click: true
-            });
-          });
-        }
+      this.ratings = initData.data;
+      this.$nextTick(() => {
+        this.scroll = new BScroll(this.$refs.ratings, {
+          click: true
+        });
       });
     },
     methods: {
