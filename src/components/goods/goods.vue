@@ -51,9 +51,7 @@
   import shopcart from 'components/shopcart/shopcart';
   import cartcontrol from 'components/cartcontrol/cartcontrol';
   import food from 'components/food/food';
-
-  const ERR_OK = 0;
-  const debug = process.env.NODE_ENV !== 'production';
+  import {initData} from 'common/js/initData';
 
   export default {
     props: {
@@ -95,17 +93,10 @@
     },
     created() {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
-
-      const url = debug ? '/api/goods' : 'http://wxclaude.com/sell/api/goods';
-      this.$http.get(url).then((response) => {
-        response = response.body;
-        if (response.errno === ERR_OK) {
-          this.goods = response.data;
-          this.$nextTick(() => {
-            this._initScroll();
-            this._calculateHeight();
-          });
-        }
+      this.goods = initData.data;
+      this.$nextTick(() => {
+        this._initScroll();
+        this._calculateHeight();
       });
     },
     methods: {
