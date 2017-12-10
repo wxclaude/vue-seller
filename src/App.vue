@@ -19,11 +19,9 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import { urlParse } from 'common/js/util';
+  import {urlParse} from 'common/js/util';
+  import {initData} from 'common/js/initData';
   import header from 'components/header/header.vue';
-
-  const ERR_OK = 0;
-  const debug = process.env.NODE_ENV !== 'production';
 
   export default {
     data() {
@@ -37,13 +35,7 @@
       };
     },
     created() {
-      const url = debug ? '/api/seller' : 'http://wxclaude.com/sell/api/seller';
-      this.$http.get(url + '?id=' + this.seller.id).then((response) => {
-        response = response.body;
-        if (response.errno === ERR_OK) {
-          this.seller = Object.assign({}, this.seller, response.data);
-        }
-      });
+      this.seller = initData.seller;
     },
     components: {
       'v-header': header
