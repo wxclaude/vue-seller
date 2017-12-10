@@ -81,7 +81,7 @@
       };
     },
     created() {
-      this.ratings = initData.data;
+      this.ratings = initData.ratings;
       this.$nextTick(() => {
         this.scroll = new BScroll(this.$refs.ratings, {
           click: true
