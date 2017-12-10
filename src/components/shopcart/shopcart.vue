@@ -4,23 +4,17 @@
       <div class="content" @click="toggleList">
         <div class="content-left">
           <div class="logo-wrapper">
-            <div class="logo" :class="{highlight:ifCount}">
-              <i class="icon-shopping_cart" :class="{highlight:ifCount}"></i>
+            <div class="logo" :class="{'highlight':totalCount>0}">
+              <i class="icon-shopping_cart" :class="{'highlight':totalCount>0}"></i>
             </div>
             <div class="num" v-show="totalCount>0">{{totalCount}}</div>
           </div>
-          <div class="price" :class="{highlight:ifCount}">￥{{totalPrice}}</div>
+          <div class="price" :class="{'highlight':totalPrice>0}">￥{{totalPrice}}</div>
           <div class="desc">另需配送费￥{{deliveryPrice}}元</div>
         </div>
         <div class="content-right" @click.stop.prevent="pay">
           <div class="pay" :class="payClass">
             {{payDesc}}
-
-
-
-
-
-
           </div>
         </div>
       </div>
@@ -44,7 +38,7 @@
               <li class="food" v-for="food in selectFoods">
                 <span class="name">{{food.name}}</span>
                 <div class="price">
-                  <span>￥{{food.price * food.count}}</span>
+                  <span>￥{{food.price*food.count}}</span>
                 </div>
                 <div class="cartcontrol-wrapper">
                   <cartcontrol @add="addFood" :food="food"></cartcontrol>
@@ -64,15 +58,18 @@
 <script type="text/ecmascript-6">
   import BScroll from 'better-scroll';
   import cartcontrol from 'components/cartcontrol/cartcontrol';
+
   export default {
     props: {
       selectFoods: {
         type: Array,
-        default () {
-          return [{
-            price: 20,
-            count: 1
-          }];
+        default() {
+          return [
+            {
+              price: 10,
+              count: 1
+            }
+          ];
         }
       },
       deliveryPrice: {
@@ -84,93 +81,62 @@
         default: 0
       }
     },
-    data () {
+    data() {
       return {
         balls: [
-          {show: false},
-          {show: false},
-          {show: false},
-          {show: false},
-          {show: false}
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          }
         ],
         dropBalls: [],
         fold: true
       };
     },
-    methods: {
-      pay () {
-        if (this.totalPrice < this.minPrice) {
-          return;
-        }
-        window.alert(`支付${this.totalPrice}元`);
-      },
-      addFood (target) {
-        this.drop(target);
-      },
-      drop (el) {
-        for (let i = 0; i < this.balls.length; i++) {
-          let ball = this.balls[i];
-          if (!ball.show) {
-            ball.show = true;
-            ball.el = el;
-            this.dropBalls.push(ball);
-            return;
-          }
-        }
-      },
-      toggleList () {
-        if (!this.totalCount) {
-          return;
-        }
-        this.fold = !this.fold;
-      },
-      hideList () {
-        this.fold = true;
-      },
-      empty () {
-        this.selectFoods.forEach((food) => {
-          food.count = 0;
-        });
-      },
-      beforeDrop (el) {
-        let count = this.balls.length;
-        while (count--) {
-          let ball = this.balls[count];
-          if (ball.show) {
-            let rect = ball.el.getBoundingClientRect();
-            let x = rect.left - 32;
-            let y = -(window.innerHeight - rect.top - 22);
-            el.style.display = '';
-            el.style.webkitTransform = `translate3d(0,${y}px,0)`;
-            el.style.transform = `translate3d(0,${y}px,0)`;
-            let inner = el.getElementsByClassName('inner-hook')[0];
-            inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
-            inner.style.transform = `translate3d(${x}px,0,0)`;
-          }
-        }
-      },
-      dropping (el, done) {
-        /* eslint-disable no-unused-vars */
-        let rf = el.offsetHeight;
-        this.$nextTick(() => {
-          el.style.webkitTransform = 'translate3d(0,0,0)';
-          el.style.transform = 'translate3d(0,0,0)';
-          let inner = el.getElementsByClassName('inner-hook')[0];
-          inner.style.webkitTransform = 'translate3d(0,0,0)';
-          inner.style.transform = 'translate3d(0,0,0)';
-          el.addEventListener('transitionend', done);
-        });
-      },
-      afterDrop (el) {
-        let ball = this.dropBalls.shift();
-        if (ball) {
-          ball.show = false;
-          el.style.display = 'none';
-        }
-      }
-    },
     computed: {
-      listShow () {
+      totalPrice() {
+        let total = 0;
+        this.selectFoods.forEach((food) => {
+          total += food.price * food.count;
+        });
+        return total;
+      },
+      totalCount() {
+        let count = 0;
+        this.selectFoods.forEach((food) => {
+          count += food.count;
+        });
+        return count;
+      },
+      payDesc() {
+        if (this.totalPrice === 0) {
+          return `￥${this.minPrice}元起送`;
+        } else if (this.totalPrice < this.minPrice) {
+          let diff = this.minPrice - this.totalPrice;
+          return `还差￥${diff}元起送`;
+        } else {
+          return '去结算';
+        }
+      },
+      payClass() {
+        if (this.totalPrice < this.minPrice) {
+          return 'not-enough';
+        } else {
+          return 'enough';
+        }
+      },
+      listShow() {
         if (!this.totalCount) {
           this.fold = true;
           return false;
@@ -188,38 +154,77 @@
           });
         }
         return show;
-      },
-      payClass () {
-        return this.totalPrice >= this.minPrice ? 'enough' : 'not-enough';
-      },
-      totalPrice () {
-        let total = 0;
-        this.selectFoods.forEach((food) => {
-          total += food.price * food.count;
-        });
-        return total;
-      },
-      totalCount () {
-        let count = 0;
-        this.selectFoods.forEach((food) => {
-          count += food.count;
-        });
-        if (count > 99) {
-          count = 99;
+      }
+    },
+    methods: {
+      drop(el) {
+        for (let i = 0; i < this.balls.length; i++) {
+          let ball = this.balls[i];
+          if (!ball.show) {
+            ball.show = true;
+            ball.el = el;
+            this.dropBalls.push(ball);
+            return;
+          }
         }
-        return count;
       },
-      ifCount () {
-        return this.totalCount > 0;
+      toggleList() {
+        if (!this.totalCount) {
+          return;
+        }
+        this.fold = !this.fold;
       },
-      payDesc () {
-        if (this.totalPrice === 0) {
-          return `￥${this.minPrice}元起送`;
-        } else if (this.totalPrice < this.minPrice) {
-          let diff = this.minPrice - this.totalPrice;
-          return `还差￥${diff}元起送`;
-        } else {
-          return '去结算';
+      hideList() {
+        this.fold = true;
+      },
+      empty() {
+        this.selectFoods.forEach((food) => {
+          food.count = 0;
+        });
+      },
+      pay() {
+        if (this.totalPrice < this.minPrice) {
+          return;
+        }
+        window.alert(`支付${this.totalPrice}元`);
+      },
+      addFood(target) {
+        this.drop(target);
+      },
+      beforeDrop(el) {
+        let count = this.balls.length;
+        while (count--) {
+          let ball = this.balls[count];
+          if (ball.show) {
+            let rect = ball.el.getBoundingClientRect();
+            let x = rect.left - 32;
+            let y = -(window.innerHeight - rect.top - 22);
+            el.style.display = '';
+            el.style.webkitTransform = `translate3d(0,${y}px,0)`;
+            el.style.transform = `translate3d(0,${y}px,0)`;
+            let inner = el.getElementsByClassName('inner-hook')[0];
+            inner.style.webkitTransform = `translate3d(${x}px,0,0)`;
+            inner.style.transform = `translate3d(${x}px,0,0)`;
+          }
+        }
+      },
+      dropping(el, done) {
+        /* eslint-disable no-unused-vars */
+        let rf = el.offsetHeight;
+        this.$nextTick(() => {
+          el.style.webkitTransform = 'translate3d(0,0,0)';
+          el.style.transform = 'translate3d(0,0,0)';
+          let inner = el.getElementsByClassName('inner-hook')[0];
+          inner.style.webkitTransform = 'translate3d(0,0,0)';
+          inner.style.transform = 'translate3d(0,0,0)';
+          el.addEventListener('transitionend', done);
+        });
+      },
+      afterDrop(el) {
+        let ball = this.dropBalls.shift();
+        if (ball) {
+          ball.show = false;
+          el.style.display = 'none';
         }
       }
     },
@@ -231,6 +236,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixin.styl"
+
   .shopcart
     position: fixed
     left: 0
@@ -355,6 +361,7 @@
           float: right
           font-size: 12px
           color: rgb(0, 160, 220)
+
       .list-content
         padding: 0 18px
         max-height: 217px

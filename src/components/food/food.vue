@@ -23,11 +23,6 @@
           <transition name="fade">
             <div @click.stop.prevent="addFirst" class="buy" v-show="!food.count || food.count===0">
               加入购物车
-
-
-
-
-
             </div>
           </transition>
         </div>
@@ -52,8 +47,7 @@
                 </div>
                 <div class="time">{{rating.rateTime | formatDate}}</div>
                 <p class="text">
-                  <span
-                    :class="[rating.rateType===0?icon-thumb_up:'',rating.rateType===1?icon-thumb_down:'']"></span>{{rating.text}}
+                  <span :class="{'icon-thumb_up':rating.rateType===0,'icon-thumb_down':rating.rateType===1}"></span>{{rating.text}}
                 </p>
               </li>
             </ul>
@@ -81,7 +75,7 @@
         type: Object
       }
     },
-    data () {
+    data() {
       return {
         showFlag: false,
         selectType: ALL,
@@ -94,7 +88,7 @@
       };
     },
     methods: {
-      show () {
+      show() {
         this.showFlag = true;
         this.selectType = ALL;
         this.onlyContent = true;
@@ -108,17 +102,17 @@
           }
         });
       },
-      hide () {
+      hide() {
         this.showFlag = false;
       },
-      addFirst (event) {
+      addFirst(event) {
         if (!event._constructed) {
           return;
         }
         this.$emit('add', event.target);
         Vue.set(this.food, 'count', 1);
       },
-      needShow (type, text) {
+      needShow(type, text) {
         if (this.onlyContent && !text) {
           return false;
         }
@@ -128,16 +122,16 @@
           return type === this.selectType;
         }
       },
-      addFood (target) {
+      addFood(target) {
         this.$emit('add', target);
       },
-      selectRating (type) {
+      selectRating(type) {
         this.selectType = type;
         this.$nextTick(() => {
           this.scroll.refresh();
         });
       },
-      toggleContent () {
+      toggleContent() {
         this.onlyContent = !this.onlyContent;
         this.$nextTick(() => {
           this.scroll.refresh();
@@ -145,7 +139,7 @@
       }
     },
     filters: {
-      formatDate (time) {
+      formatDate(time) {
         let date = new Date(time);
         return formatDate(date, 'yyyy-MM-dd hh:mm');
       }
@@ -160,6 +154,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixin.styl"
+
   .food
     position: fixed
     left: 0
@@ -193,6 +188,7 @@
           padding: 10px
           font-size: 20px
           color: #fff
+
     .content
       position: relative
       padding: 18px
@@ -302,6 +298,7 @@
               color: rgb(0, 160, 220)
             .icon-thumb_down
               color: rgb(147, 153, 159)
+
         .no-rating
           padding: 16px 0
           font-size: 12px

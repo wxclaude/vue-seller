@@ -2,13 +2,13 @@
   <div class="ratingselect">
     <div class="rating-type border-1px">
       <span @click="select(2,$event)" class="block positive" :class="{'active':selectType===2}">{{desc.all}}<span
-        class="count">{{ratings.length}}</span></span>
+          class="count">{{ratings.length}}</span></span>
       <span @click="select(0,$event)" class="block positive" :class="{'active':selectType===0}">{{desc.positive}}<span
-        class="count">{{positives.length}}</span></span>
+          class="count">{{positives.length}}</span></span>
       <span @click="select(1,$event)" class="block negative" :class="{'active':selectType===1}">{{desc.negative}}<span
-        class="count">{{negatives.length}}</span></span>
+          class="count">{{negatives.length}}</span></span>
     </div>
-    <div @click="toggleContent" class="switch" :class="{on:onlyContent}">
+    <div @click="toggleContent" class="switch" :class="{'on':onlyContent}">
       <span class="icon-check_circle"></span>
       <span class="text">只看有内容的评价</span>
     </div>
@@ -24,7 +24,7 @@
     props: {
       ratings: {
         type: Array,
-        default () {
+        default() {
           return [];
         }
       },
@@ -38,7 +38,7 @@
       },
       desc: {
         type: Object,
-        default () {
+        default() {
           return {
             all: '全部',
             positive: '满意',
@@ -48,25 +48,25 @@
       }
     },
     computed: {
-      positives () {
+      positives() {
         return this.ratings.filter((rating) => {
           return rating.rateType === POSITIVE;
         });
       },
-      negatives () {
+      negatives() {
         return this.ratings.filter((rating) => {
           return rating.rateType === NEGATIVE;
         });
       }
     },
     methods: {
-      select (type, event) {
+      select(type, event) {
         if (!event._constructed) {
           return;
         }
         this.$emit('select', type);
       },
-      toggleContent (event) {
+      toggleContent(event) {
         if (!event._constructed) {
           return;
         }
@@ -78,6 +78,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixin.styl"
+
   .ratingselect
     .rating-type
       padding: 18px 0

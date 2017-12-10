@@ -53,6 +53,7 @@
   import food from 'components/food/food';
 
   const ERR_OK = 0;
+  const debug = process.env.NODE_ENV !== 'production';
 
   export default {
     props: {
@@ -60,7 +61,7 @@
         type: Object
       }
     },
-    data () {
+    data() {
       return {
         goods: [],
         listHeight: [],
@@ -69,7 +70,7 @@
       };
     },
     computed: {
-      currentIndex () {
+      currentIndex() {
         for (let i = 0; i < this.listHeight.length; i++) {
           let height1 = this.listHeight[i];
           let height2 = this.listHeight[i + 1];
@@ -80,7 +81,7 @@
         }
         return 0;
       },
-      selectFoods () {
+      selectFoods() {
         let foods = [];
         this.goods.forEach((good) => {
           good.foods.forEach((food) => {
@@ -92,10 +93,11 @@
         return foods;
       }
     },
-    created () {
+    created() {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
 
-      this.$http.get('/api/goods').then((response) => {
+      const url = debug ? '/api/goods' : 'http://wxclaude.com/sell/api/goods';
+      this.$http.get(url).then((response) => {
         response = response.body;
         if (response.errno === ERR_OK) {
           this.goods = response.data;
@@ -107,7 +109,7 @@
       });
     },
     methods: {
-      selectMenu (index, event) {
+      selectMenu(index, event) {
         if (!event._constructed) {
           return;
         }
@@ -115,23 +117,23 @@
         let el = foodList[index];
         this.foodsScroll.scrollToElement(el, 300);
       },
-      selectFood (food, event) {
+      selectFood(food, event) {
         if (!event._constructed) {
           return;
         }
         this.selectedFood = food;
         this.$refs.food.show();
       },
-      addFood (target) {
+      addFood(target) {
         this._drop(target);
       },
-      _drop (target) {
+      _drop(target) {
         // 体验优化,异步执行下落动画
         this.$nextTick(() => {
           this.$refs.shopcart.drop(target);
         });
       },
-      _initScroll () {
+      _initScroll() {
         this.meunScroll = new BScroll(this.$refs.menuWrapper, {
           click: true
         });
@@ -148,7 +150,7 @@
           }
         });
       },
-      _calculateHeight () {
+      _calculateHeight() {
         let foodList = this.$refs.foodList;
         let height = 0;
         this.listHeight.push(height);
@@ -158,7 +160,7 @@
           this.listHeight.push(height);
         }
       },
-      _followScroll (index) {
+      _followScroll(index) {
         let menuList = this.$refs.menuList;
         let el = menuList[index];
         this.meunScroll.scrollToElement(el, 300, 0, -100);
@@ -174,6 +176,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixin.styl"
+
   .goods
     display: flex
     position: absolute

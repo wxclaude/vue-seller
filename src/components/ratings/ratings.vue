@@ -46,7 +46,6 @@
               </div>
               <div class="time">
                 {{rating.rateTime | formatDate}}
-
               </div>
             </div>
           </li>
@@ -65,6 +64,7 @@
 
   const ALL = 2;
   const ERR_OK = 0;
+  const debug = process.env.NODE_ENV !== 'production';
 
   export default {
     props: {
@@ -72,15 +72,16 @@
         type: Object
       }
     },
-    data () {
+    data() {
       return {
         ratings: [],
         selectType: ALL,
         onlyContent: true
       };
     },
-    created () {
-      this.$http.get('/api/ratings').then((response) => {
+    created() {
+      const url = debug ? '/api/ratings' : 'http://wxclaude.com/sell/api/ratings';
+      this.$http.get(url).then((response) => {
         response = response.body;
         if (response.errno === ERR_OK) {
           this.ratings = response.data;
@@ -93,7 +94,7 @@
       });
     },
     methods: {
-      needShow (type, text) {
+      needShow(type, text) {
         if (this.onlyContent && !text) {
           return false;
         }
@@ -103,13 +104,13 @@
           return type === this.selectType;
         }
       },
-      selectRating (type) {
+      selectRating(type) {
         this.selectType = type;
         this.$nextTick(() => {
           this.scroll.refresh();
         });
       },
-      toggleContent () {
+      toggleContent() {
         this.onlyContent = !this.onlyContent;
         this.$nextTick(() => {
           this.scroll.refresh();
@@ -117,7 +118,7 @@
       }
     },
     filters: {
-      formatDate (time) {
+      formatDate(time) {
         let date = new Date(time);
         return formatDate(date, 'yyyy-MM-dd hh:mm');
       }
@@ -132,6 +133,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixin.styl"
+
   .ratings
     position: absolute
     top: 174px
